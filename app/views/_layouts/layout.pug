@@ -1,0 +1,20 @@
+block var
+
+<!DOCTYPE html>
+html(lang="en")
+	head
+		block meta
+			include meta
+		block css
+			include css
+		title=pageTitle
+	body
+		block header
+			include header
+		main
+			block main
+			#page-verify(data-class=bodyClass)
+		block footer
+			include footer
+		block js
+			include js

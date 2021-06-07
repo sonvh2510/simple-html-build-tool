@@ -1,0 +1,73 @@
+{
+  "main": "gulpfile.js",
+  "name": "simple-html-build-tool",
+  "version": "1.0.0",
+  "description": "pug, scss, js",
+  "author": "sonvh2510",
+  "license": "ISC",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "set NODE_ENV=development&& gulp dev",
+    "build:dev": "set NODE_ENV=development&& gulp build",
+    "build:prod": "set NODE_ENV=production&& gulp build"
+  },
+  "browserslist": [
+    "defaults",
+    "last 2 version",
+    "> 5%"
+  ],
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-classes",
+      "@babel/plugin-proposal-class-properties",
+      "@babel/plugin-transform-async-to-generator"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-transform-async-to-generator": "^7.13.0",
+    "@babel/plugin-transform-classes": "^7.14.4",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@babel/register": "^7.13.16",
+    "@babel/runtime": "^7.14.0",
+    "autoprefixer": "^10.0.1",
+    "babelify": "^10.0.0",
+    "browser-sync": "^2.26.13",
+    "browserify": "^17.0.0",
+    "compression": "^1.7.4",
+    "cssnano": "^4.1.10",
+    "del": "^6.0.0",
+    "fancy-log": "^1.3.3",
+    "fibers": "^5.0.0",
+    "fs": "0.0.1-security",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-if": "^3.0.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^9.0.0",
+    "gulp-pug": "^4.0.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-strip-comments": "^2.5.2",
+    "gulp-terser": "^2.0.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-uglify-es": "^2.0.0",
+    "node-sass": "^4.14.1",
+    "postcss": "^8.1.4",
+    "tsify": "^5.0.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "rxjs": "^7.1.0"
+  }
+}

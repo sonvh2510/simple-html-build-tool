@@ -1,0 +1,164 @@
+@font-face {
+	font-family: 'Font Awesome 5 Pro';
+	font-style: normal;
+	font-weight: 300;
+	font-display: auto;
+	src: url('../fonts/fa-light-300.woff2') format('woff2'),
+		url('../fonts/fa-light-300.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'Font Awesome 5 Brands';
+	font-style: normal;
+	font-weight: normal;
+	font-display: auto;
+	src: url('../fonts/fa-brands-400.woff2') format('woff2'),
+		url('../fonts/fa-brands-400.woff') format('woff');
+}
+@font-face {
+	font-family: 'Font Awesome 5 Pro';
+	font-style: normal;
+	font-weight: 400;
+	font-display: auto;
+	src: url('../fonts/fa-regular-400.woff2') format('woff2'),
+		url('../fonts/fa-regular-400.woff') format('woff');
+}
+@font-face {
+	font-family: 'Font Awesome 5 Pro';
+	font-style: normal;
+	font-weight: 900;
+	font-display: auto;
+	src: url('../fonts/fa-solid-900.woff2') format('woff2'),
+		url('../fonts/fa-solid-900.woff') format('woff');
+}
+
+.fab {
+	font-family: 'Font Awesome 5 Brands';
+}
+.fal {
+	font-family: 'Font Awesome 5 Pro';
+	font-weight: 300;
+}
+.far {
+	font-family: 'Font Awesome 5 Pro';
+	font-weight: 400;
+}
+.fa,
+.fad,
+.fas {
+	font-family: 'Font Awesome 5 Pro';
+	font-weight: 900;
+}
+
+.fa,
+.fab,
+.fad,
+.fal,
+.far,
+.fas {
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	display: inline-block;
+	font-style: normal;
+	font-variant: normal;
+	text-rendering: auto;
+	line-height: 1;
+}
+
+.fa-external-link-alt:before {
+	content: '\f35d';
+}
+.fa-chevron-up:before {
+	content: '\f077';
+}
+.fa-chevron-left:before {
+	content: '\f053';
+}
+.fa-chevron-right:before {
+	content: '\f054';
+}
+.fa-bars:before {
+	content: '\f0c9';
+}
+.fa-chevron-down:before {
+	content: '\f078';
+}
+.fa-home-lg-alt:before {
+	content: '\f80c';
+}
+.fa-shopping-cart:before {
+	content: '\f07a';
+}
+.fa-search:before {
+	content: '\f002';
+}
+.fa-calendar-alt:before {
+	content: '\f073';
+}
+.fa-google::before {
+	content: '\f1a0';
+}
+.fa-facebook-f::before {
+	content: '\f39e';
+}
+.fa-facebook-square::before {
+	content: '\f082';
+}
+.fa-twitter::before {
+	content: '\f099';
+}
+.fa-youtube:before {
+	content: '\f167';
+}
+.fa-instagram::before {
+	content: '\f16d';
+}
+.fa-tripadvisor::before {
+	content: '\f262';
+}
+.fa-map-marker-alt:before {
+	content: '\f3c5';
+}
+.fa-times:before {
+	content: '\f00d';
+}
+.fa-ellipsis-h:before {
+	content: '\f141';
+}
+.fa-check:before {
+	content: '\f00c';
+}
+.fa-redo-alt:before {
+	content: '\f2f9';
+}
+.fa-star:before {
+	content: '\f005';
+}
+.fa-thumbs-up::before {
+	content: '\f164';
+}
+.fa-plus-square:before {
+	content: '\f0fe';
+}
+
+.fa-pinterest-p::before {
+	content: '\f231';
+}
+.fa-linkedin-in::before {
+	content: '\f0e1';
+}
+.fa-edit:before {
+	content: '\f044';
+}
+.fa-gift:before {
+	content: '\f06b';
+}
+.fa-comments-alt:before {
+	content: '\f4b6';
+}
+.fa-filter:before {
+	content: '\f0b0';
+}
+.fa-pig:before {
+	content: '\f706';
+}
