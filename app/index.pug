@@ -1,15 +1,9 @@
 extends views/_layouts/layout
 
 block var
-	- bodyClass = "index-page"
-	- pageTitle = "Index"
+  - bodyClass = "index-page"
+  - pageTitle = "Index"
 
 block main
-	.container
-		#form(data-action="/list/add")
-			label
-				input(type="file", name="files[]" multiple)
-			button#btn Submit
-	.container
-		h1 This is footer
-		img(src="https://source.unsplash.com/random/960*1080", alt="")
+  .container
+    button(click="showEvent()") Test API
