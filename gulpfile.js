@@ -27,46 +27,51 @@ const autoprefixer = require('autoprefixer');
 const isProd = process.env.NODE_ENV === 'production';
 
 const renderHTML = (glob) => {
-  return src(glob)
-    .pipe(
-      plumber(function (err) {
-        console.log(err);
-        this.emit('end');
-      }),
-    )
-    .pipe(
-      pug({
-        pretty: '\t',
-      }),
-    )
-    .pipe(dest('_dist'));
+  console.log(`Rendering ${glob}`);
+  return new Promise((resolve) => {
+    src(glob)
+      .pipe(
+        plumber(function (err) {
+          console.log(err);
+          this.emit('end');
+        }),
+      )
+      .pipe(
+        pug({
+          pretty: '\t',
+        }),
+      )
+      .pipe(dest('_dist'));
+    resolve();
+  });
 };
 
 const imageChangeTask = (path) => {
-  const filePathnameGlob = path.replace(/[/\\]/g, '/');
-  const destPathname = filePathnameGlob
+  const pathSplited = path.split(/\/|\\/);
+  const fileGlob = pathSplited.join('/');
+  const destPathname = fileGlob
     .replace('public', '_dist')
-    .replace(filePathnameGlob.split('/')[filePathnameGlob.split('/').length - 1], '');
-  console.log(`Copy: '${filePathnameGlob}'   =====>   '${destPathname}'`);
-  return src(filePathnameGlob).pipe(dest(destPathname));
+    .replace(pathSplited[pathSplited.length - 1], '');
+  console.log(`Copy: '${fileGlob}'   =====>   '${destPathname}'`);
+  return src(fileGlob).pipe(dest(destPathname));
 };
 
 const imageRemoveTask = (path) => {
-  const filePathnameGlob = path.replace(/[/\\]/g, '/');
-  const destPathname = filePathnameGlob.replace('public', '_dist');
+  const pathSplited = path.split(/\/|\\/);
+  const fileGlob = pathSplited.join('/');
+  const destPathname = fileGlob.replace('public', '_dist');
   console.log(`Deleted: '${destPathname}'`);
   return del(destPathname);
 };
 
 // Define gulp tasks
-
 task('clean-dist', () => {
   return del('_dist');
 });
 
 task('copy-fonts', () => {
   return new Promise((resolve) => {
-    const fonts = JSON.parse(readFileSync('vendors.json')).fonts;
+    const { fonts } = JSON.parse(readFileSync('vendors.json'));
     if (fonts.length > 0) {
       src(fonts, {
         allowEmpty: true,
@@ -86,7 +91,7 @@ task('copy-assets', () => {
 
 task('core-js', () => {
   return new Promise((resolve) => {
-    const js = JSON.parse(readFileSync('vendors.json')).js;
+    const { js } = JSON.parse(readFileSync('vendors.json'));
     if (js.length > 0) {
       src(js, {
         allowEmpty: true,
@@ -104,7 +109,7 @@ task('core-js', () => {
 
 task('core-css', () => {
   return new Promise((resolve) => {
-    const css = JSON.parse(readFileSync('vendors.json')).css;
+    const { css } = JSON.parse(readFileSync('vendors.json'));
     if (css.length > 0) {
       src(css, {
         allowEmpty: true,
@@ -209,47 +214,20 @@ task('serve', () => {
       middleware: [compression()],
     },
     port: 4200,
+    watch: true,
   });
-  watch('app/views/_**/**.pug').on('change', (path) => {
-    console.log(`Files changed: '${path}'`);
-    console.log('Rendering: All templates');
-    return renderHTML('app/**.pug');
-  });
+  watch('app/views/_**/**.pug', series('render'));
 
-  watch(['app/*.pug']).on('change', (path) => {
-    console.log(`Files changed: '${path}'`);
-    let pageName;
-    let glob;
-    if (path.indexOf('/') >= 0) {
-      pageName = path.split('/')[1];
+  watch(['app/**/**.pug', '!app/views/_**/*.pug']).on('change', (path) => {
+    let fileGlob;
+    const pathSplited = path.split(/\/|\\/);
+    if (pathSplited.includes('views')) {
+      const page = pathSplited.splice(2, 1);
+      fileGlob = `app/${page}.pug`;
     } else {
-      pageName = path.split('\\')[1];
+      fileGlob = path;
     }
-    if (pageName.indexOf('.pug') >= 0) {
-      glob = `app/${pageName}`;
-    } else {
-      glob = `app/${pageName}.pug`;
-    }
-    console.log(`Rendering: '${path}'`);
-    return renderHTML(glob);
-  });
-
-  watch(['app/views/**/**.pug', '!app/views/_**/**.pug']).on('change', (path) => {
-    console.log(`Files changed: '${path}'`);
-    let pageName;
-    let glob;
-    if (path.indexOf('/') >= 0) {
-      pageName = path.split('/')[2];
-    } else {
-      pageName = path.split('\\')[2];
-    }
-    if (pageName.indexOf('.pug') >= 0) {
-      glob = `app/${pageName}`;
-    } else {
-      glob = `app/${pageName}.pug`;
-    }
-    console.log(`Rendering: '${path}'`);
-    return renderHTML(glob);
+    return renderHTML(fileGlob);
   });
 
   watch(['public/**/**.{jpeg,jpg,png,gif,svg,ico,mp4,webp}'], {
@@ -263,19 +241,17 @@ task('serve', () => {
     .on('unlink', imageRemoveTask)
     .on('unlinkDir', imageRemoveTask);
 
-  watch(['app/scripts/**/**.js'], series('main-js'));
+  watch(['app/scripts/**/*.js'], series('main-js'));
 
   watch(
-    ['app/styles/**/**.scss'],
+    ['app/styles/**/*.scss'],
     {
       delay: 300,
     },
     series('main-css'),
   );
 
-  watch(['vendors.json', 'vendors/**/**.**'], parallel('core-js', 'core-css', 'copy-fonts'));
-
-  watch(['_dist/**/**.**']).on('change', bSync.reload);
+  watch(['vendors.json', 'vendors/**/*.{js,css}'], parallel('core-js', 'core-css', 'copy-fonts'));
 });
 
 exports.dev = series(
