@@ -2,8 +2,7 @@ const { series, parallel, src, dest, watch, task } = require('gulp');
 const { readFileSync } = require('fs');
 const del = require('del');
 const pug = require('gulp-pug');
-const sass = require('gulp-sass');
-const Fiber = require('fibers');
+const sass = require('gulp-sass')(require('sass'));
 const bSync = require('browser-sync');
 const strip = require('gulp-strip-comments');
 const gulpif = require('gulp-if');
@@ -34,12 +33,12 @@ const renderHTML = (glob) => {
         plumber(function (err) {
           console.log(err);
           this.emit('end');
-        }),
+        })
       )
       .pipe(
         pug({
           pretty: '\t',
-        }),
+        })
       )
       .pipe(dest('_dist'));
     resolve();
@@ -124,7 +123,7 @@ task('core-css', () => {
                 specialComments: false,
               },
             },
-          }),
+          })
         )
         .pipe(dest('_dist/css'));
     } else {
@@ -143,13 +142,8 @@ task('main-js', () => {
   })
     .transform(
       babelify.configure({
-        presets: ['@babel/preset-env'],
-        plugins: [
-          '@babel/plugin-proposal-class-properties',
-          '@babel/plugin-transform-async-to-generator',
-        ],
         extensions: ['.js'],
-      }),
+      })
     )
     .bundle()
     .pipe(source('main.js'))
@@ -158,14 +152,14 @@ task('main-js', () => {
       plumber(function (err) {
         console.log(err);
         this.emit('end');
-      }),
+      })
     )
     .pipe(gulpif(!isProd, sourcemaps.init({ loadMaps: true })))
     .pipe(gulpif(isProd, terser()))
     .pipe(
       rename({
         suffix: '.min',
-      }),
+      })
     )
     .pipe(gulpif(!isProd, sourcemaps.write('')))
     .pipe(dest('_dist/js'));
@@ -175,7 +169,7 @@ task('main-css', () => {
   return new Promise((resolve) => {
     src(['app/styles/**.scss', '!app/styles/_*.scss'])
       .pipe(gulpif(!isProd, sourcemaps.init()))
-      .pipe(sass({ fiber: Fiber }).on('error', sass.logError))
+      .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
       .pipe(
         gulpif(
           isProd,
@@ -190,8 +184,8 @@ task('main-css', () => {
                 restructureRules: true,
               },
             },
-          }),
-        ),
+          })
+        )
       )
       .pipe(postcss([autoprefixer({ cascade: false })]))
       .pipe(gulpif(isProd, postcss([cssnano()])))
@@ -248,7 +242,7 @@ task('serve', () => {
     {
       delay: 300,
     },
-    series('main-css'),
+    series('main-css')
   );
 
   watch(['vendors.json', 'vendors/**/*.{js,css}'], parallel('core-js', 'core-css', 'copy-fonts'));
@@ -260,7 +254,7 @@ exports.dev = series(
   parallel('core-js', 'core-css'),
   parallel('main-js', 'main-css'),
   'render',
-  'serve',
+  'serve'
 );
 
 exports.build = series(
@@ -268,5 +262,5 @@ exports.build = series(
   'copy-assets',
   parallel('core-js', 'core-css'),
   parallel('main-js', 'main-css'),
-  'render',
+  'render'
 );
