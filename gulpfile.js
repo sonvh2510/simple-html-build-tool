@@ -25,48 +25,28 @@ const autoprefixer = require('autoprefixer');
 // Helper functions
 const isProd = process.env.NODE_ENV === 'production';
 
-const renderHTML = (glob) => {
-  console.log(`Rendering ${glob}`);
-  return new Promise((resolve) => {
-    src(glob)
-      .pipe(
-        plumber(function (err) {
-          console.log(err);
-          this.emit('end');
-        })
-      )
-      .pipe(
-        pug({
-          pretty: '\t',
-        })
-      )
-      .pipe(dest('_dist'));
-    resolve();
-  });
-};
-
 const imageChangeTask = (path) => {
+  console.log(path);
   const pathSplited = path.split(/\/|\\/);
   const fileGlob = pathSplited.join('/');
   const destPathname = fileGlob
-    .replace('public', '_dist')
+    .replace('public', 'build')
     .replace(pathSplited[pathSplited.length - 1], '');
   console.log(`Copy: '${fileGlob}'   =====>   '${destPathname}'`);
   return src(fileGlob).pipe(dest(destPathname));
 };
 
 const imageRemoveTask = (path) => {
+  console.log(path);
   const pathSplited = path.split(/\/|\\/);
   const fileGlob = pathSplited.join('/');
-  const destPathname = fileGlob.replace('public', '_dist');
+  const destPathname = fileGlob.replace('public', 'build');
   console.log(`Deleted: '${destPathname}'`);
   return del(destPathname);
 };
 
 // Define gulp tasks
-task('clean-dist', () => {
-  return del('_dist');
-});
+task('clean-dist', () => del('build'));
 
 task('copy-fonts', () => {
   return new Promise((resolve) => {
@@ -74,7 +54,7 @@ task('copy-fonts', () => {
     if (fonts.length > 0) {
       src(fonts, {
         allowEmpty: true,
-      }).pipe(dest('_dist/fonts'));
+      }).pipe(dest('build/fonts'));
     } else {
       console.log('Không có đường dẫn fonts để copy');
     }
@@ -85,7 +65,7 @@ task('copy-fonts', () => {
 task('copy-assets', () => {
   return src('public/**', {
     allowEmpty: true,
-  }).pipe(dest('_dist'));
+  }).pipe(dest('build'));
 });
 
 task('core-js', () => {
@@ -98,7 +78,7 @@ task('core-js', () => {
         .pipe(concat('core.min.js'))
         .pipe(strip())
         .pipe(uglify())
-        .pipe(dest('_dist/js'));
+        .pipe(dest('build/js'));
     } else {
       console.log('Không có đường dẫn thư viện js để copy');
     }
@@ -125,7 +105,7 @@ task('core-css', () => {
             },
           })
         )
-        .pipe(dest('_dist/css'));
+        .pipe(dest('build/css'));
     } else {
       console.log('Không có đường dẫn thư viện css để copy');
     }
@@ -136,7 +116,7 @@ task('core-css', () => {
 task('main-js', () => {
   return browserify({
     basedir: '.',
-    entries: ['app/scripts/main.js'],
+    entries: ['src/scripts/main.js'],
     debug: true,
     sourceMaps: true,
   })
@@ -162,12 +142,12 @@ task('main-js', () => {
       })
     )
     .pipe(gulpif(!isProd, sourcemaps.write('')))
-    .pipe(dest('_dist/js'));
+    .pipe(dest('build/js'));
 });
 
 task('main-css', () => {
   return new Promise((resolve) => {
-    src(['app/styles/**.scss', '!app/styles/_*.scss'])
+    src(['src/styles/**.scss', '!src/styles/_*.scss'])
       .pipe(gulpif(!isProd, sourcemaps.init()))
       .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
       .pipe(
@@ -191,42 +171,45 @@ task('main-css', () => {
       .pipe(gulpif(isProd, postcss([cssnano()])))
       .pipe(rename({ suffix: '.min' }))
       .pipe(gulpif(!isProd, sourcemaps.write('.')))
-      .pipe(dest('_dist/css'));
+      .pipe(dest('build/css'));
     resolve();
   });
 });
 
 task('render', () => {
-  return renderHTML('app/**.pug');
+  return new Promise((resolve) => {
+    src('src/pages/**.pug')
+      .pipe(
+        plumber(function (err) {
+          console.log(err);
+          this.emit('end');
+        })
+      )
+      .pipe(
+        pug({
+          pretty: true,
+        })
+      )
+      .pipe(dest('build'));
+    resolve();
+  });
 });
 
 task('serve', () => {
-  bSync.init({
-    notify: true,
+  const browser = bSync.init({
+    notify: false,
     server: {
-      baseDir: '_dist',
+      baseDir: 'build',
       middleware: [compression()],
     },
-    port: 4200,
-    watch: true,
-  });
-  watch('app/views/_**/**.pug', series('render'));
-
-  watch(['app/**/**.pug', '!app/views/_**/*.pug']).on('change', (path) => {
-    let fileGlob;
-    const pathSplited = path.split(/\/|\\/);
-    if (pathSplited.includes('views')) {
-      const page = pathSplited.splice(2, 1);
-      fileGlob = `app/${page}.pug`;
-    } else {
-      fileGlob = path;
-    }
-    return renderHTML(fileGlob);
+    port: 8080,
+    // watch: true,
   });
 
-  watch(['public/**/**.{jpeg,jpg,png,gif,svg,ico,mp4,webp}'], {
+  watch('src/**/**.pug', series('render'));
+
+  watch(['public/**/**.{jpeg,jpg,png,gif,svg,ico,mp4,webp,json}'], {
     ignorePermissionErrors: true,
-    delay: 300,
     events: 'all',
   })
     .on('add', imageChangeTask)
@@ -235,17 +218,13 @@ task('serve', () => {
     .on('unlink', imageRemoveTask)
     .on('unlinkDir', imageRemoveTask);
 
-  watch(['app/scripts/**/*.js'], series('main-js'));
+  watch(['src/scripts/**/*.js'], series('main-js'));
 
-  watch(
-    ['app/styles/**/*.scss'],
-    {
-      delay: 300,
-    },
-    series('main-css')
-  );
+  watch(['src/styles/**/*.scss'], series('main-css'));
 
   watch(['vendors.json', 'vendors/**/*.{js,css}'], parallel('core-js', 'core-css', 'copy-fonts'));
+
+  watch(['public', 'build/**/**.**']).on('change', () => browser.reload());
 });
 
 exports.dev = series(

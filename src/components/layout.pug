@@ -1,0 +1,22 @@
+block var
+
+<!DOCTYPE html>
+html(lang="en")
+  head
+    block meta
+      include _layouts/meta
+    block css
+      include _layouts/css
+    title=pageTitle
+  body
+    input#page-verify(value=bodyClass hidden)
+    block header
+      include _layouts/header
+    main
+      block main
+    block footer
+      include _layouts/footer
+    block loader
+      //- include _commons/loader
+    block js
+      include _layouts/js

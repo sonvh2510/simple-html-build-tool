@@ -6,11 +6,11 @@
   "author": "sonvh2510",
   "license": "ISC",
   "scripts": {
-    "start": "npm run dev",
-    "dev": "set NODE_ENV=development&& gulp dev",
-    "lint": "./node_modules/.bin/eslint *.js",
+    "serve": "npm run dev",
+    "dev": "cross-env NODE_ENV=development gulp dev",
     "build:dev": "cross-env NODE_ENV=development gulp build",
-    "build:prod": "cross-env NODE_ENV=production gulp build"
+    "build:prod": "cross-env NODE_ENV=production gulp build",
+    "lint": "./node_modules/.bin/eslint *.js"
   },
   "browserslist": [
     "defaults",
